@@ -1,0 +1,225 @@
+﻿@using Microsoft.AspNet.Identity;
+@using Amazon.DynamoDBv2;
+@using Amazon.DynamoDBv2.DataModel;
+@using Amazon.DynamoDBv2.DocumentModel;
+@using CSC_CA2.Models;
+@{ ViewBag.Title = "Viewing talent"; }
+
+
+@{
+    var client = new AmazonDynamoDBClient();
+    var context = new DynamoDBContext(client);
+    string userId = User.Identity.GetUserId();
+
+    if (userId != null)
+    {
+
+        UserPlan userPlan = context.Load<UserPlan>(userId);
+
+
+        if (userPlan.Plan == "Premium")
+        {
+<script src="https://cdn.jsdelivr.net/gh/recombee/js-api-client@3.0.0/dist/recombee-api-client.min.js"></script>
+                <script>
+                    var client = new recombee.ApiClient('cscca2talents-dev', 'Ej4xWXwrbTUQnkExtL2AQHK9vkZgGm1zkASDqzmKJHNYW5RQ6NdhMgknyDUSBJDO');
+                    $(document).ready(function () {
+                        var userId;
+
+                        var url = window.location.href;
+                        talentId = url.substring(url.lastIndexOf('/') + 1);
+
+                        $.ajax({
+                            url: `/api/Account/AccountId`,
+                            method: 'GET',
+                            dataType: 'json',
+                            success: function (data) {
+                                if (typeof data.id !== 'undefined') {
+                                    setTimeout(function () {
+                                        client.send(new recombee.AddDetailView(data.id, talentId, {
+                                            cascadeCreate: true
+                                        }));
+                                    }, 4000);
+
+                                    getRecommendation(talentId, data.id);
+
+                                }
+                            },
+                            error: function (data) {
+                                var n = noty({
+                                    text: "An error occurred, the talent may not exist.", layout: 'center', type: 'error', timeout: 1750
+                                })
+                                n.show();
+                            }
+                        });
+
+                    });
+                    function getRecommendation(talentId, userId) {
+                        client.send(new recombee.RecommendItemsToItem(talentId, userId, 5, {
+                            returnProperties: true,
+                        }))
+                            .then(function (res) {
+                                console.log(res.recomms.length)
+                                var html = "<ul>";
+                                for (var i = 0; i < res.recomms.length; i++) {
+                                    var id = res.recomms[i].id;
+                                    console.log(id);
+                                    var name = res.recomms[i].values.name;
+                                    html = `<li><a href = "/Home/Talent/${id}">${name}</a></li>`;
+                                    $('#recommendations').append(html + '<ul/>');
+
+                                }
+                                console.log(html);
+
+                            })
+                            .catch(function (error) {
+                                html = `<p>Oops, we encountered an error while trying to your recommendations</p>`;
+                                $('#recommendations').append(html);
+                            });
+                    }
+
+                </script>
+        }
+<script>
+    $(document).ready(function () {
+        var url = window.location.href;
+
+        id = url.substring(url.lastIndexOf('/') + 1);
+
+        $.ajax({
+            url: ` https://kxlwf4cbyl.execute-api.us-east-1.amazonaws.com/dev/GetTalent/${id}`,
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                $('#talent-name').text(data.shortName);
+                $('#talent-fullName').text(data.name);
+                $('#talent-reknown').text(data.reknown);
+                $('#img-container').html(`<img src="${data.imageUrl}"/>`);
+                $('#talent-profile').text(data.profile);
+            },
+            error: function (data) {
+                var n = noty({
+                    text: data.message, layout: 'center', type: 'error', timeout: 1750
+                })
+                n.show();
+            }
+        });
+    })
+
+</script>
+<style>
+    #img-container {
+        text-align: center;
+        padding: 1.25em;
+    }
+
+    img {
+        max-height: 25em;
+    }
+</style>
+<h1 id="talent-name"></h1>
+<div id="img-container"></div>
+<h4>Full name: <span id="talent-fullName"></span></h4>
+<h4>Reknown for: <span id="talent-reknown"></span></h4>
+<p id="talent-profile"></p>
+<br />
+
+<h5>More like this</h5>
+        if (userPlan.Plan == "Premium")
+        {
+<div id="recommendations"></div> }
+        else
+        {
+    <p> Subscribe to get personalised recommendations.</p>
+        }
+
+
+<h5>Discussion</h5> 
+        if (userPlan.Plan == "Premium")
+        {
+<div id="disqus_thread"></div>
+                <script>
+                    var disqus_config = function () {
+                        this.page.url = window.location.href;
+                        this.page.identifier = url.substring(url.lastIndexOf('/') + 1);
+                    };
+
+                    (function () {
+                        var d = document, s = d.createElement('script');
+                        s.src = 'https://cscca2-3.disqus.com/embed.js';
+                        s.setAttribute('data-timestamp', +new Date());
+                        (d.head || d.body).appendChild(s);
+                    })();
+                </script>
+                                <noscript>
+                                    Please enable JavaScript to view the
+                                    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+                                        comments powered by Disqus.
+                                    </a>
+                                </noscript> }
+        else
+        {
+                                    <p> Subscribe to one of our plans to view and create comments on talent photos.</p>
+        }
+    }
+    else
+    {
+        <script>
+    $(document).ready(function () {
+        var url = window.location.href;
+
+        id = url.substring(url.lastIndexOf('/') + 1);
+
+        $.ajax({
+            url: ` https://kxlwf4cbyl.execute-api.us-east-1.amazonaws.com/dev/GetTalent/${id}`,
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                $('#talent-name').text(data.shortName);
+                $('#talent-fullName').text(data.name);
+                $('#talent-reknown').text(data.reknown);
+                $('#img-container').html(`<img src="${data.imageUrl}"/>`);
+                $('#talent-profile').text(data.profile);
+            },
+            error: function (data) {
+                var n = noty({
+                    text: data.message, layout: 'center', type: 'error', timeout: 1750
+                })
+                n.show();
+            }
+        });
+    })
+
+</script>
+<style>
+    #img-container {
+        text-align: center;
+        padding: 1.25em;
+    }
+
+    img {
+        max-height: 25em;
+    }
+</style>
+<h1 id="talent-name"></h1>
+<div id="img-container"></div>
+<h4>Full name: <span id="talent-fullName"></span></h4>
+<h4>Reknown for: <span id="talent-reknown"></span></h4>
+<p id="talent-profile"></p>
+<br />
+
+<h5>More like this</h5>
+        
+
+    <p> Subscribe to get personalised recommendations.</p>
+        
+
+
+<h5>Discussion</h5> 
+        
+                                    <p> Subscribe to one of our plans to view and create comments on talent photos.</p>
+        
+
+
+    }
+
+    }
